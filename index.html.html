@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BALLOON POP – PECAHKAN BALON PINTAR | Seni Budaya SD Kelas 1</title>
+    <!-- Font Ramah Anak SD dari Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- MediaPipe Hands & Camera Utils CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        /* ==========================================================================
+           1. VARIABEL & RESET DASAR (DESAIN CERAH ANAK SD)
+           ========================================================================== */
+        :root {
+            --sky-top: #38bdf8;
+            --sky-mid: #7dd3fc;
+            --sky-bottom: #e0f2fe;
+            --grass-light: #4ade80;
+            --grass-dark: #16a34a;
+            --sun-yellow: #fde047;
+            --sun-orange: #f59e0b;
+            --primary-btn: #f97316;
+            --primary-btn-shadow: #c2410c;
+            --secondary-btn: #0ea5e9;
+            --secondary-btn-shadow: #0369a1;
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-dark: #1e293b;
+            --font-display: 'Fredoka', sans-serif;
+            --font-body: 'Nunito', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-body);
+            background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 60%, var(--sky-bottom) 100%);
+            color: var(--text-dark);
+        }
+
+        /* ==========================================================================
+           2. LATAR BELAKANG LANGIT, MATAHARI, AWAN & BUKIT HIJAU
+           ========================================================================== */
+        .sky-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* Matahari Tersenyum Beranimasi */
+        .sun-container {
+            position: absolute;
+            top: 72px;
+            right: 4%;
+            width: 90px;
+            height: 90px;
+            animation: sunFloat 6s ease-in-out infinite;
+        }
+
+        .sun-rays {
+            position: absolute;
+            inset: -14px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(253, 224, 71, 0.55) 35%, rgba(253, 224, 71, 0) 70%);
+            animation: sunPulse 3s ease-in-out infinite;
+        }
+
+        .sun-body {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #fef08a, #facc15 65%, #f59e0b 100%);
+            box-shadow: 0 0 25px rgba(250, 204, 21, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes sunFloat {
+            0%, 100% { transform: translateY(0) rotate(-3deg); }
+            50% { transform: translateY(-8px) rotate(4deg); }
+        }
+
+        @keyframes sunPulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.18); opacity: 1; }
+        }
+
+        /* Awan Melayang */
+        .cloud {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 100px;
+            opacity: 0.92;
+            box-shadow: 0 8px 16px rgba(14, 116, 144, 0.12);
+        }
+
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+        }
+
+        .cloud-1 {
+            width: 140px;
+            height: 46px;
+            top: 14%;
+            left: -160px;
+            animation: cloudMove 34s linear infinite;
+        }
+        .cloud-1::before { width: 64px; height: 64px; top: -32px; left: 22px; }
+        .cloud-1::after { width: 48px; height: 48px; top: -20px; right: 22px; }
+
+        .cloud-2 {
+            width: 180px;
+            height: 56px;
+            top: 28%;
+            left: -200px;
+            opacity: 0.82;
+            animation: cloudMove 46s linear infinite 12s;
+        }
+        .cloud-2::before { width: 80px; height: 80px; top: -40px; left: 30px; }
+        .cloud-2::after { width: 58px; height: 58px; top: -25px; right: 28px; }
+
+        .cloud-3 {
+            width: 120px;
+            height: 40px;
+            top: 44%;
+            left: -150px;
+            opacity: 0.75;
+            animation: cloudMove 38s linear infinite 24s;
+        }
+        .cloud-3::before { width: 54px; height: 54px; top: -26px; left: 18px; }
+        .cloud-3::after { width: 42px; height: 42px; top: -18px; right: 18px; }
+
+        @keyframes cloudMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 280px)); }
+        }
+
+        /* Bukit & Rumput Hijau di Bawah */
+        .hills-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 110px;
+            pointer-events: none;
+        }
+
+        .hill-back {
+            position: absolute;
+            bottom: -25px;
+            left: -10%;
+            width: 65%;
+            height: 110px;
+            background: #22c55e;
+            border-radius: 50% 50% 0 0;
+        }
+
+        .hill-front {
+            position: absolute;
+            bottom: -30px;
+            right: -10%;
+            width: 75%;
+            height: 100px;
+            background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 -4px 15px rgba(22, 163, 74, 0.2);
+        }
+
+        /* ==========================================================================
+           3. NAVBAR / HUD ATAS
+           ========================================================================== */
+        .navbar {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 4px solid #bae6fd;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+        }
+
+        .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .badge-student {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #fcd34d;
+        }
+
+        .badge-level {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 2px solid #93c5fd;
+        }
+
+        .badge-hots {
+            font-family: var(--font-display);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        .hots-LOTS { background: #dcfce7; color: #166534; border: 2px solid #86efac; }
+        .hots-MOTS { background: #fef9c3; color: #854d0e; border: 2px solid #fde047; }
+        .hots-HOTS { background: #fae8ff; color: #86198f; border: 2px solid #f0abfc; }
+
+        .badge-score {
+            background: #ffedd5;
+            color: #9a3412;
+            border: 2px solid #fdba74;
+            font-size: 1rem;
+        }
+
+        .badge-timer {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 2px solid #cbd5e1;
+            min-width: 78px;
+            justify-content: center;
+        }
+
+        .badge-timer.warning {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+            animation: pulseFast 0.6s infinite alternate;
+        }
+
+        @keyframes pulseFast {
+            from { transform: scale(1); }
+            to { transform: scale(1.06); }
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 14px;
+            border: none;
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.15s, filter 0.15s;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+        }
+
+        .icon-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.18);
+        }
+
+        .btn-cam-toggle { background: #e0f2fe; color: #0369a1; }
+        .btn-cam-toggle.active { background: #22c55e; color: #ffffff; }
+        .btn-sound-toggle { background: #fef3c7; color: #b45309; }
+        .btn-sound-toggle.muted { background: #e2e8f0; color: #64748b; }
+
+        /* Progress Bar */
+        .progress-wrapper {
+            position: relative;
+            z-index: 19;
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #facc15, #fb923c, #f43f5e);
+            border-radius: 0 999px 999px 0;
+            transition: width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* ==========================================================================
+           4. KOTAK PERTANYAAN & AREA PERMAINAN BALON
+           ========================================================================== */
+        .game-stage {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: calc(100vh - 68px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 16px;
+        }
+
+        .question-card {
+            width: 100%;
+            max-width: 840px;
+            background: var(--card-bg);
+            border: 4px solid #38bdf8;
+            border-radius: 26px;
+            padding: 14px 22px;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.18);
+            text-align: center;
+            position: relative;
+            z-index: 15;
+            transition: transform 0.3s ease;
+        }
+
+        .question-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #0284c7;
+        }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: clamp(1.15rem, 2.6vw, 1.65rem);
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.35;
+        }
+
+        /* Kontainer Balon Terbang */
+        .balloon-arena {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 8px;
+        }
+
+        /* ==========================================================================
+           5. DESAIN BALON 3D-STYLE GLOSSY + SWATCH WARNA + TALI
+           ========================================================================== */
+        .balloon-wrapper {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: filter 0.15s ease;
+            touch-action: manipulation;
+            will-change: transform, left, top;
+        }
+
+        .balloon-wrapper:hover .balloon-body,
+        .balloon-wrapper.hovered .balloon-body {
+            transform: scale(1.08);
+            box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24), inset -12px -14px 24px rgba(0, 0, 0, 0.22), inset 10px 10px 22px rgba(255, 255, 255, 0.65), 0 0 0 6px rgba(255, 255, 255, 0.75);
+        }
+
+        .balloon-body {
+            position: relative;
+            width: clamp(128px, 19vw, 168px);
+            height: clamp(148px, 22vw, 192px);
+            border-radius: 50% 50% 50% 50% / 44% 44% 56% 56%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            text-align: center;
+            /* Efek 3D Glossy */
+            box-shadow: 
+                0 14px 26px rgba(0, 0, 0, 0.18),
+                inset -14px -16px 26px rgba(0, 0, 0, 0.25),
+                inset 12px 12px 22px rgba(255, 255, 255, 0.55);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        }
+
+        /* Kilau Cahaya (Specular Highlight) */
+        .balloon-body::before {
+            content: '';
+            position: absolute;
+            top: 14%;
+            left: 18%;
+            width: 26%;
+            height: 16%;
+            background: rgba(255, 255, 255, 0.65);
+            border-radius: 50%;
+            transform: rotate(-32deg);
+            pointer-events: none;
+        }
+
+        /* Simpul Bawah Balon */
+        .balloon-knot {
+            width: 18px;
+            height: 12px;
+            margin-top: -3px;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+            filter: brightness(0.85);
+        }
+
+        /* Tali Balon Bergoyang */
+        .balloon-string {
+            width: 24px;
+            height: 46px;
+            margin-top: -1px;
+            pointer-events: none;
+        }
+
+        /* Konten Jawaban di Dalam Balon */
+        .balloon-label-card {
+            background: rgba(255, 255, 255, 0.94);
+            border-radius: 16px;
+            padding: 7px 11px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            max-width: 92%;
+            z-index: 2;
+        }
+
+        .color-swatch-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2.5px solid #1e293b;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.6);
+        }
+
+        .balloon-answer-text {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(0.95rem, 1.8vw, 1.18rem);
+            color: #0f172a;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+
+        /* Animasi Getar Saat Jawaban Salah */
+        .balloon-shake {
+            animation: shakeAnim 0.45s cubic-bezier(.36,.07,.19,.97) both !important;
+        }
+
+        @keyframes shakeAnim {
+            10%, 90% { transform: translate(-50%, -50%) translate3d(-4px, 0, 0) rotate(-3deg); }
+            20%, 80% { transform: translate(-50%, -50%) translate3d(6px, 0, 0) rotate(3deg); }
+            30%, 50%, 70% { transform: translate(-50%, -50%) translate3d(-8px, 0, 0) rotate(-4deg); }
+            40%, 60% { transform: translate(-50%, -50%) translate3d(8px, 0, 0) rotate(4deg); }
+        }
+
+        /* ==========================================================================
+           6. EFEK PARTIKEL BALON PECAH, GELOMBANG POP & UMPAN BALIK
+           ========================================================================== */
+        #fxCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        .feedback-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            z-index: 40;
+            padding: 14px 28px;
+            border-radius: 999px;
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 3vw, 1.7rem);
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+        }
+
+        .feedback-toast.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .feedback-toast.correct {
+            background: linear-gradient(135deg, #22c55e, #15803d);
+            border: 4px solid #bbf7d0;
+        }
+
+        .feedback-toast.wrong {
+            background: linear-gradient(135deg, #f97316, #dc2626);
+            border: 4px solid #fed7aa;
+        }
+
+        /* ==========================================================================
+           7. KURSOR TANGAN MEDIAPIPE & PREVIEW KAMERA POJOK LAYAR
+           ========================================================================== */
+        #handCursor {
+            position: fixed;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 45;
+            transform: translate(-50%, -50%);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.1s, height 0.1s, background 0.1s;
+        }
+
+        .cursor-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 4px solid #facc15;
+            background: rgba(250, 204, 21, 0.22);
+            box-shadow: 0 0 16px rgba(250, 204, 21, 0.8);
+            transition: transform 0.1s ease, border-color 0.1s ease, background 0.1s ease;
+        }
+
+        #handCursor.pinching .cursor-ring {
+            transform: scale(0.65);
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.45);
+            box-shadow: 0 0 22px rgba(239, 68, 68, 0.95);
+        }
+
+        .cursor-icon {
+            font-size: 24px;
+            z-index: 2;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+        }
+
+        /* Kotak Preview Kamera Kecil */
+        .camera-widget {
+            position: fixed;
+            bottom: 14px;
+            right: 14px;
+            z-index: 35;
+            width: 168px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 3px solid #38bdf8;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            display: none;
+            flex-direction: column;
+        }
+
+        .camera-widget.active {
+            display: flex;
+        }
+
+        .camera-video-box {
+            position: relative;
+            width: 100%;
+            height: 112px;
+            background: #000;
+        }
+
+        #webcamVideo {
+            display: none;
+        }
+
+        #cameraCanvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror natural untuk anak */
+        }
+
+        .camera-status-bar {
+            padding: 5px 8px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #f8fafc;
+            text-align: center;
+            background: #0284c7;
+        }
+
+        .camera-status-bar.pinched {
+            background: #ef4444;
+        }
+
+        /* ==========================================================================
+           8. MODAL LAYAR AWAL, TRANSISI LEVEL, & SERTIFIKAT AKHIR
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(15, 23, 42, 0.62);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border: 5px solid #38bdf8;
+            border-radius: 32px;
+            width: 100%;
+            max-width: 560px;
+            padding: 26px 24px;
+            text-align: center;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.75); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .game-logo-badge {
+            display: inline-block;
+            background: #fef08a;
+            color: #854d0e;
+            border: 2px solid #facc15;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .game-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 4.5vw, 2.4rem);
+            font-weight: 700;
+            color: #0284c7;
+            line-height: 1.15;
+            margin-bottom: 6px;
+            text-shadow: 2px 2px 0 #bae6fd;
+        }
+
+        .game-subtitle {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 18px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .student-input {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 16px;
+            border: 3px solid #cbd5e1;
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            color: #0f172a;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .student-input:focus {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+
+        /* Pilihan Mode Kontrol */
+        .control-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .control-card {
+            border: 3px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 12px 10px;
+            cursor: pointer;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .control-card.selected {
+            border-color: #0ea5e9;
+            background: #e0f2fe;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+        }
+
+        .control-card-icon {
+            font-size: 1.8rem;
+        }
+
+        .control-card-title {
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #0f172a;
+        }
+
+        .control-card-desc {
+            font-size: 0.75rem;
+            color: #475569;
+            line-height: 1.25;
+        }
+
+        /* Kotak Konfirmasi Izin Kamera */
+        .camera-consent-box {
+            background: #fffbeb;
+            border: 2px dashed #f59e0b;
+            border-radius: 14px;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            font-size: 0.82rem;
+            color: #92400e;
+            text-align: left;
+            display: none;
+        }
+
+        .camera-consent-box.visible {
+            display: block;
+        }
+
+        .consent-checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 6px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .consent-checkbox-row input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: #f97316;
+        }
+
+        .primary-action-btn {
+            width: 100%;
+            padding: 15px 24px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
+            color: #ffffff;
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--primary-btn-shadow), 0 10px 20px rgba(249, 115, 22, 0.35);
+            transition: transform 0.12s, box-shadow 0.12s;
+        }
+
+        .primary-action-btn:hover {
+            filter: brightness(1.05);
+        }
+
+        .primary-action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--primary-btn-shadow);
+        }
+
+        .error-inline {
+            color: #dc2626;
+            font-size: 0.85rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            min-height: 20px;
+        }
+
+        /* Bintang & Sertifikat Akhir */
+        .stars-row {
+            font-size: 2.8rem;
+            margin: 10px 0;
+            letter-spacing: 6px;
+        }
+
+        .certificate-box {
+            background: linear-gradient(135deg, #fefce8 0%, #fff7ed 100%);
+            border: 4px double #f59e0b;
+            border-radius: 22px;
+            padding: 18px 16px;
+            margin: 14px 0 18px;
+        }
+
+        .cert-student-name {
+            font-family: var(--font-display);
+            font-size: 1.7rem;
+            color: #b45309;
+            margin: 6px 0;
+            text-decoration: underline decoration-wavy #facc15;
+        }
+
+        .cert-score-big {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        /* Responsif Mobile Kecil */
+        @media (max-width: 600px) {
+            .navbar { padding: 8px 10px; }
+            .badge-pill { padding: 4px 9px; font-size: 0.78rem; }
+            .question-card { padding: 10px 14px; border-radius: 20px; }
+            .camera-widget { width: 126px; bottom: 8px; right: 8px; }
+            .camera-video-box { height: 86px; }
+            .control-options { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================================================
+         LATAR BELAKANG LANGIT, MATAHARI, AWAN, & BUKIT HIJAU
+         ====================================================================== -->
+    <div class="sky-backdrop" aria-hidden="true">
+        <div class="sun-container">
+            <div class="sun-rays"></div>
+            <div class="sun-body">
+                <!-- Wajah Matahari Tersenyum SVG -->
+                <svg width="54" height="54" viewBox="0 0 60 60" fill="none">
+                    <circle cx="20" cy="24" r="3.5" fill="#78350f"/>
+                    <circle cx="40" cy="24" r="3.5" fill="#78350f"/>
+                    <circle cx="14" cy="31" r="4" fill="#fb7185" opacity="0.55"/>
+                    <circle cx="46" cy="31" r="4" fill="#fb7185" opacity="0.55"/>
+                    <path d="M21 34C24 40 36 40 39 34" stroke="#78350f" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </div>
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="hills-container">
+            <div class="hill-back"></div>
+            <div class="hill-front"></div>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         NAVBAR / HUD ATAS
+         ====================================================================== -->
+    <header class="navbar">
+        <div class="nav-group">
+            <div class="badge-pill badge-student" id="hudStudentName">👦 Siswa: Hebat</div>
+            <div class="badge-pill badge-level" id="hudLevel">🎈 Level 1/5</div>
+            <div class="badge-pill badge-hots hots-LOTS" id="hudCategory">LOTS</div>
+        </div>
+        <div class="nav-group">
+            <div class="badge-pill badge-score" id="hudScore">⭐ 0</div>
+            <div class="badge-pill badge-timer" id="hudTimer">⏱️ 30d</div>
+            <button type="button" class="icon-btn btn-cam-toggle" id="btnToggleCamera" title="Aktifkan/Matikan Kamera Gesture">
+                📷 <span id="camBtnLabel">Kamera</span>
+            </button>
+            <button type="button" class="icon-btn btn-sound-toggle" id="btnToggleSound" title="Suara Nyala/Mati">
+                🔊
+            </button>
+        </div>
+    </header>
+
+    <!-- Progress Bar Kemajuan Soal -->
+    <div class="progress-wrapper">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <!-- ======================================================================
+         AREA UTAMA PERMAINAN
+         ====================================================================== -->
+    <main class="game-stage">
+        <section class="question-card" id="questionCard">
+            <div class="question-meta">
+                <span id="questionNumberLabel">Pertanyaan 1 dari 3</span>
+                <span>•</span>
+                <span>Seni Budaya: Warna Primer & Sekunder</span>
+            </div>
+            <h1 class="question-text" id="questionText">
+                Memuat pertanyaan seru...
+            </h1>
+        </section>
+
+        <!-- Arena Balon Terbang -->
+        <div class="balloon-arena" id="balloonArena"></div>
+    </main>
+
+    <!-- Canvas Efek Partikel Balon Pecah & Konfeti -->
+    <canvas id="fxCanvas"></canvas>
+
+    <!-- Toast Umpan Balik Cepat -->
+    <div class="feedback-toast" id="feedbackToast">Hebat! +100 Poin!</div>
+
+    <!-- Kursor Interaktif Ujung Jari Telunjuk (MediaPipe) -->
+    <div id="handCursor">
+        <div class="cursor-ring"></div>
+        <span class="cursor-icon" id="cursorEmoji">👆</span>
+    </div>
+
+    <!-- Preview Kamera Kecil di Pojok Kanan Bawah -->
+    <aside class="camera-widget" id="cameraWidget">
+        <div class="camera-video-box">
+            <video id="webcamVideo" playsinline></video>
+            <canvas id="cameraCanvas" width="320" height="240"></canvas>
+        </div>
+        <div class="camera-status-bar" id="cameraStatusBar">Mencari tangan...</div>
+    </aside>
+
+    <!-- ======================================================================
+         MODAL 1: LAYAR AWAL (INPUT NAMA & PILIHAN KONTROL)
+         ====================================================================== -->
+    <div class="modal-overlay" id="startModal">
+        <div class="modal-card">
+            <div class="game-logo-badge">🎨 SENI BUDAYA • SD KELAS 1</div>
+            <h2 class="game-title">BALLOON POP<br>PECAHKAN BALON PINTAR</h2>
+            <p class="game-subtitle">Belajar Warna Primer & Sekunder Sambil Memecahkan Balon!</p>
+
+            <div class="input-group">
+                <label for="studentNameInput" class="input-label">✏️ Siapa nama lengkapmu?</label>
+                <input type="text" id="studentNameInput" class="student-input" placeholder="Contoh: Budi Santoso" maxlength="24" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">🎮 Pilih cara memecahkan balon:</label>
+                <div class="control-options">
+                    <div class="control-card selected" id="optTouchMouse" data-mode="touch">
+                        <span class="control-card-icon">👆🖱️</span>
+                        <span class="control-card-title">Sentuh / Mouse</span>
+                        <span class="control-card-desc">Ketuk layar atau klik balon jawaban secara langsung</span>
+                    </div>
+                    <div class="control-card" id="optCameraGesture" data-mode="camera">
+                        <span class="control-card-icon">🖐️🤏</span>
+                        <span class="control-card-title">Kamera & Gesture</span>
+                        <span class="control-card-desc">Arahkan telunjuk & cubit (pinch) di depan kamera</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Konfirmasi Izin Kamera Eksplisit -->
+            <div class="camera-consent-box" id="cameraConsentBox">
+                <div><strong>🔒 Izin Kamera Diperlukan:</strong> Kamera hanya digunakan di perangkatmu untuk mendeteksi gerakan jari telunjuk dan cubitan (pinch). Video tidak direkam atau dikirim ke mana pun.</div>
+                <label class="consent-checkbox-row">
+                    <input type="checkbox" id="cameraConsentCheckbox">
+                    <span>Saya (didampingi guru/orang tua) mengizinkan akses kamera untuk bermain.</span>
+                </label>
+            </div>
+
+            <div class="error-inline" id="startErrorMsg"></div>
+
+            <button type="button" class="primary-action-btn" id="btnStartGame">
+                🚀 MULAI BERMAIN!
+            </button>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         MODAL 2: TRANSISI ANTAR LEVEL
+         ====================================================================== -->
+    <div class="modal-overlay hidden" id="levelModal">
+        <div class="modal-card">
+            <div class="game-logo-badge" id="levelModalBadge">LEVEL 1 SELESAI!</div>
+            <div class="stars-row" id="levelModalStars">⭐⭐⭐</div>
+            <h2 class="game-title" id="levelModalTitle">Luar Biasa!</h2>
+            <p class="game-subtitle" id="levelModalDesc">Kamu sudah mengenal warna-warna dasar dengan sangat baik!</p>
+            <div style="background:#f0f9ff; border-radius:16px; padding:12px; margin-bottom:18px; font-weight:800; color:#0369a1;">
+                Skor Sementara: <span id="levelModalScore" style="font-size:1.3rem; color:#f97316;">300</span> Poin
+            </div>
+            <button type="button" class="primary-action-btn" id="btnNextLevel">
+                🎈 LANJUT KE LEVEL BERIKUTNYA!
+            </button>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         MODAL 3: APRESIASI AKHIR PERMAINAN (SERTIFIKAT BINTANG WARNA)
+         ====================================================================== -->
+    <div class="modal-overlay hidden" id="endModal">
+        <div class="modal-card">
+            <div class="game-logo-badge">🏆 SELAMAT! SEMUA LEVEL SELESAI</div>
+            <h2 class="game-title">SERTIFIKAT BINTANG WARNA</h2>
+            <div class="stars-row" id="endStarsRow">⭐⭐⭐</div>
+
+            <div class="certificate-box">
+                <div style="font-size:0.9rem; font-weight:800; color:#78350f;">Diberikan kepada Seniman Cilik Hebat:</div>
+                <div class="cert-student-name" id="certStudentName">Budi Santoso</div>
+                <div style="font-size:0.9rem; font-weight:700; color:#475569; margin-bottom:8px;">
+                    Telah menuntaskan 5 Level Seni Budaya: Warna Primer & Sekunder
+                </div>
+                <div style="font-size:0.85rem; font-weight:800; color:#0f172a;">TOTAL SKOR AKHIR:</div>
+                <div class="cert-score-big" id="certFinalScore">1500</div>
+                <div id="certPredicate" style="margin-top:6px; font-weight:900; color:#0284c7; font-size:1.05rem;">
+                    Predikat: Master Pelangi Kelas 1! 🌈
+                </div>
+            </div>
+
+            <button type="button" class="primary-action-btn" id="btnPlayAgain">
+                🔄 MAIN LAGI
+            </button>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         JAVASCRIPT UTAMA (BANK SOAL, AUDIO, FISIKA BALON, MEDIAPIPE HANDS)
+         ====================================================================== -->
+    <script>
+        'use strict';
+
+        /* ====================================================================
+           1. BANK SOAL TERSTRUKTUR: 5 LEVEL x 3 SOAL (LOTS -> MOTS -> HOTS)
+           Materi: Warna Primer (Merah, Kuning, Biru) & Sekunder (Oranye, Hijau, Ungu)
+           ==================================================================== */
+        const GAME_LEVELS = [
+            {
+                level: 1,
+                title: "Mengenal Warna Primer",
+                summary: "Kamu sudah kenal 3 warna utama: Merah, Kuning, dan Biru!",
+                questions: [
+                    {
+                        category: "LOTS",
+                        text: "Ada 3 warna utama yang disebut warna primer. Warna apakah yang sama seperti buah pisang matang?",
+                        options: [
+                            { text: "Kuning", color: "#facc15", swatch: "#facc15", correct: true },
+                            { text: "Hijau", color: "#22c55e", swatch: "#22c55e", correct: false },
+                            { text: "Ungu", color: "#a855f7", swatch: "#a855f7", correct: false }
+                        ]
+                    },
+                    {
+                        category: "MOTS",
+                        text: "Manakah kelompok yang semuanya termasuk WARNA PRIMER (warna dasar)?",
+                        options: [
+                            { text: "Merah, Kuning, Biru", color: "#ef4444", swatch: null, correct: true },
+                            { text: "Hijau, Ungu, Oranye", color: "#22c55e", swatch: null, correct: false },
+                            { text: "Hitam, Putih, Cokelat", color: "#64748b", swatch: null, correct: false }
+                        ]
+                    },
+                    {
+                        category: "HOTS",
+                        text: "Rani ingin menggambar langit cerah dan matahari, tetapi ia hanya punya 3 cat warna primer. Cat warna apa saja yang harus Rani ambil?",
+                        options: [
+                            { text: "Biru dan Kuning", color: "#0ea5e9", swatch: null, correct: true },
+                            { text: "Hijau dan Ungu", color: "#10b981", swatch: null, correct: false },
+                            { text: "Merah dan Oranye", color: "#f97316", swatch: null, correct: false },
+                            { text: "Ungu dan Biru", color: "#8b5cf6", swatch: null, correct: false }
+                        ]
+                    }
+                ]
+            },
+            {
+                level: 2,
+                title: "Keajaiban Warna Hijau",
+                summary: "Hebat! Biru + Kuning berubah menjadi warna Hijau yang segar!",
+                questions: [
+                    {
+                        category: "LOTS",
+                        text: "Warna daun pohon dan rumput di halaman sekolah adalah warna sekunder. Warna apakah itu?",
+                        options: [
+                            { text: "Hijau", color: "#22c55e", swatch: "#22c55e", correct: true },
+                            { text: "Merah", color: "#ef4444", swatch: "#ef4444", correct: false },
+                            { text: "Kuning", color: "#facc15", swatch: "#facc15", correct: false }
+                        ]
+                    },
+                    {
+                        category: "MOTS",
+                        text: "Jika kita mencampur cat warna BIRU dan warna KUNING, warna baru apa yang muncul?",
+                        options: [
+                            { text: "Hijau", color: "#22c55e", swatch: "#22c55e", correct: true },
+                            { text: "Oranye", color: "#f97316", swatch: "#f97316", correct: false },
+                            { text: "Ungu", color: "#a855f7", swatch: "#a855f7", correct: false }
+                        ]
+                    },
+                    {
+                        category: "HOTS",
+                        text: "Di kelas, cat warna hijau milik Edo habis saat mewarnai gambar katak. Cat primer apa yang harus Edo campur agar mendapat warna hijau?",
+                        options: [
+                            { text: "Biru + Kuning", color: "#16a34a", swatch: null, correct: true },
+                            { text: "Merah + Kuning", color: "#ea580c", swatch: null, correct: false },
+                            { text: "Merah + Biru", color: "#9333ea", swatch: null, correct: false },
+                            { text: "Kuning + Kuning", color: "#eab308", swatch: null, correct: false }
+                        ]
+                    }
+                ]
+            },
+            {
+                level: 3,
+                title: "Keajaiban Warna Oranye",
+                summary: "Pintar! Merah + Kuning menghasilkan warna Oranye atau Jingga!",
+                questions: [
+                    {
+                        category: "LOTS",
+                        text: "Buah jeruk dan wortel memiliki warna sekunder yang cerah. Warna apakah itu?",
+                        options: [
+                            { text: "Oranye (Jingga)", color: "#f97316", swatch: "#f97316", correct: true },
+                            { text: "Biru", color: "#3b82f6", swatch: "#3b82f6", correct: false },
+                            { text: "Ungu", color: "#a855f7", swatch: "#a855f7", correct: false }
+                        ]
+                    },
+                    {
+                        category: "MOTS",
+                        text: "Campuran cat warna MERAH dan warna KUNING akan menghasilkan warna...",
+                        options: [
+                            { text: "Oranye", color: "#f97316", swatch: "#f97316", correct: true },
+                            { text: "Hijau", color: "#22c55e", swatch: "#22c55e", correct: false },
+                            { text: "Biru", color: "#3b82f6", swatch: "#3b82f6", correct: false }
+                        ]
+                    },
+                    {
+                        category: "HOTS",
+                        text: "Siti sudah punya cat warna KUNING. Ia ingin mewarnai gambar ikan mas menjadi warna ORANYE. Satu warna apa lagi yang Siti butuhkan?",
+                        options: [
+                            { text: "Merah", color: "#ef4444", swatch: "#ef4444", correct: true },
+                            { text: "Biru", color: "#3b82f6", swatch: "#3b82f6", correct: false },
+                            { text: "Hijau", color: "#22c55e", swatch: "#22c55e", correct: false },
+                            { text: "Ungu", color: "#a855f7", swatch: "#a855f7", correct: false }
+                        ]
+                    }
+                ]
+            },
+            {
+                level: 4,
+                title: "Keajaiban Warna Ungu",
+                summary: "Keren sekali! Merah + Biru berpadu menjadi warna Ungu!",
+                questions: [
+                    {
+                        category: "LOTS",
+                        text: "Buah anggur dan terong memiliki warna sekunder yang indah. Warna apakah itu?",
+                        options: [
+                            { text: "Ungu", color: "#a855f7", swatch: "#a855f7", correct: true },
+                            { text: "Kuning", color: "#facc15", swatch: "#facc15", correct: false },
+                            { text: "Hijau", color: "#22c55e", swatch: "#22c55e", correct: false }
+                        ]
+                    },
+                    {
+                        category: "MOTS",
+                        text: "Jika cat warna MERAH dicampur dengan cat warna BIRU, hasilnya adalah warna...",
+                        options: [
+                            { text: "Ungu", color: "#a855f7", swatch: "#a855f7", correct: true },
+                            { text: "Oranye", color: "#f97316", swatch: "#f97316", correct: false },
+                            { text: "Kuning", color: "#facc15", swatch: "#facc15", correct: false }
+                        ]
+                    },
+                    {
+                        category: "HOTS",
+                        text: "Beni mencampur cat merah dan biru untuk mewarnai anggur, tetapi warnanya masih terlalu kemerahan. Warna primer apa yang perlu ditambah sedikit?",
+                        options: [
+                            { text: "Biru", color: "#3b82f6", swatch: "#3b82f6", correct: true },
+                            { text: "Kuning", color: "#facc15", swatch: "#facc15", correct: false },
+                            { text: "Oranye", color: "#f97316", swatch: "#f97316", correct: false },
+                            { text: "Hijau", color: "#22c55e", swatch: "#22c55e", correct: false }
+                        ]
+                    }
+                ]
+            },
+            {
+                level: 5,
+                title: "Tantangan Master Pelangi",
+                summary: "Sempurna! Kamu sudah menguasai semua warna primer dan sekunder!",
+                questions: [
+                    {
+                        category: "LOTS",
+                        text: "Manakah di bawah ini yang termasuk kelompok WARNA SEKUNDER (hasil campuran 2 warna primer)?",
+                        options: [
+                            { text: "Hijau, Oranye, Ungu", color: "#a855f7", swatch: null, correct: true },
+                            { text: "Merah, Kuning, Biru", color: "#3b82f6", swatch: null, correct: false },
+                            { text: "Merah, Putih, Biru", color: "#ef4444", swatch: null, correct: false }
+                        ]
+                    },
+                    {
+                        category: "MOTS",
+                        text: "Perhatikan pasangan campuran warna berikut! Pasangan manakah yang BENAR?",
+                        options: [
+                            { text: "Biru + Kuning = Hijau", color: "#22c55e", swatch: null, correct: true },
+                            { text: "Merah + Kuning = Ungu", color: "#a855f7", swatch: null, correct: false },
+                            { text: "Merah + Biru = Oranye", color: "#f97316", swatch: null, correct: false },
+                            { text: "Kuning + Biru = Merah", color: "#ef4444", swatch: null, correct: false }
+                        ]
+                    },
+                    {
+                        category: "HOTS",
+                        text: "Lani hanya membawa 3 cat warna primer (Merah, Kuning, Biru) untuk lomba menggambar taman bunga. Bisakah Lani membuat warna daun (hijau) dan bunga ungu?",
+                        options: [
+                            { text: "Bisa, dengan mencampur cat", color: "#0ea5e9", swatch: null, correct: true },
+                            { text: "Tidak bisa sama sekali", color: "#ef4444", swatch: null, correct: false },
+                            { text: "Hanya bisa warna kuning", color: "#facc15", swatch: null, correct: false },
+                            { text: "Harus beli cat baru dulu", color: "#64748b", swatch: null, correct: false }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        /* ====================================================================
+           2. SINTESIS EFEK SUARA MENGGUNAKAN WEB AUDIO API (TANPA FILE LUAR)
+           ==================================================================== */
+        class SoundEffects {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) {
+                        this.ctx = new AudioCtx();
+                    }
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            toggleMute() {
+                this.muted = !this.muted;
+                return this.muted;
+            }
+
+            // Suara balon meletus ("POP!")
+            playPop() {
+                if (this.muted) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(520, now);
+                osc.frequency.exponentialRampToValueAtTime(95, now + 0.09);
+
+                gain.gain.setValueAtTime(0.45, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+
+            // Suara ceria saat jawaban benar ("Ding-Ding!")
+            playCorrect() {
+                if (this.muted) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const now = this.ctx.currentTime + idx * 0.07;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now);
+
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + 0.24);
+                });
+            }
+
+            // Suara lembut saat jawaban kurang tepat ("Boing")
+            playWrong() {
+                if (this.muted) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(210, now);
+                osc.frequency.linearRampToValueAtTime(140, now + 0.24);
+
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.26);
+            }
+
+            // Fanfare naik level / kemenangan
+            playFanfare() {
+                if (this.muted) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const melody = [
+                    { f: 523.25, t: 0, d: 0.14 },
+                    { f: 659.25, t: 0.14, d: 0.14 },
+                    { f: 783.99, t: 0.28, d: 0.14 },
+                    { f: 1046.50, t: 0.44, d: 0.42 }
+                ];
+
+                melody.forEach(n => {
+                    const now = this.ctx.currentTime + n.t;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(n.f, now);
+
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + n.d);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + n.d + 0.02);
+                });
+            }
+        }
+
+        const sfx = new SoundEffects();
+
+        /* ====================================================================
+           3. SISTEM PARTIKEL BALON PECAH & KONFETI (CANVAS 2D)
+           ==================================================================== */
+        const fxCanvas = document.getElementById('fxCanvas');
+        const fxCtx = fxCanvas.getContext('2d');
+        let particles = [];
+        let floatingTexts = [];
+        let shockwaves = [];
+
+        function resizeFxCanvas() {
+            fxCanvas.width = window.innerWidth;
+            fxCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeFxCanvas);
+        resizeFxCanvas();
+
+        function spawnBalloonPopEffect(x, y, mainColor, labelText) {
+            // Gelombang kejut pop
+            shockwaves.push({
+                x, y,
+                radius: 15,
+                maxRadius: 135,
+                alpha: 0.9,
+                color: mainColor
+            });
+
+            // Pecahan karet balon & konfeti warna-warni
+            const palette = [mainColor, '#facc15', '#38bdf8', '#f43f5e', '#4ade80', '#ffffff'];
+            for (let i = 0; i < 42; i++) {
+                const angle = (Math.PI * 2 * i) / 42 + (Math.random() - 0.5) * 0.3;
+                const speed = 4 + Math.random() * 10;
+                particles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 3,
+                    size: 6 + Math.random() * 8,
+                    color: palette[Math.floor(Math.random() * palette.length)],
+                    rotation: Math.random() * Math.PI * 2,
+                    vRot: (Math.random() - 0.5) * 0.25,
+                    alpha: 1,
+                    shape: i % 2 === 0 ? 'circle' : 'rect'
+                });
+            }
+
+            // Teks "+100" melayang
+            if (labelText) {
+                floatingTexts.push({
+                    x, y: y - 10,
+                    vy: -2.2,
+                    text: labelText,
+                    alpha: 1,
+                    scale: 1
+                });
+            }
+        }
+
+        function spawnVictoryConfetti() {
+            const colors = ['#ef4444', '#facc15', '#3b82f6', '#22c55e', '#f97316', '#a855f7'];
+            for (let i = 0; i < 110; i++) {
+                particles.push({
+                    x: Math.random() * fxCanvas.width,
+                    y: -20 - Math.random() * 200,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: 2 + Math.random() * 5,
+                    size: 7 + Math.random() * 8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * Math.PI * 2,
+                    vRot: (Math.random() - 0.5) * 0.2,
+                    alpha: 1,
+                    shape: 'rect'
+                });
+            }
+        }
+
+        function updateAndDrawFx() {
+            fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+
+            // Gambar gelombang kejut
+            for (let i = shockwaves.length - 1; i >= 0; i--) {
+                const sw = shockwaves[i];
+                sw.radius += (sw.maxRadius - sw.radius) * 0.18;
+                sw.alpha -= 0.055;
+                if (sw.alpha <= 0) {
+                    shockwaves.splice(i, 1);
+                    continue;
+                }
+                fxCtx.save();
+                fxCtx.beginPath();
+                fxCtx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+                fxCtx.strokeStyle = sw.color;
+                fxCtx.globalAlpha = sw.alpha;
+                fxCtx.lineWidth = 6;
+                fxCtx.stroke();
+                fxCtx.restore();
+            }
+
+            // Gambar partikel
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.28; // Gravitasi
+                p.vx *= 0.98;
+                p.rotation += p.vRot;
+                p.alpha -= 0.016;
+
+                if (p.alpha <= 0 || p.y > fxCanvas.height + 50) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                fxCtx.save();
+                fxCtx.translate(p.x, p.y);
+                fxCtx.rotate(p.rotation);
+                fxCtx.globalAlpha = Math.max(0, p.alpha);
+                fxCtx.fillStyle = p.color;
+                if (p.shape === 'circle') {
+                    fxCtx.beginPath();
+                    fxCtx.arc(0, 0, p.size * 0.5, 0, Math.PI * 2);
+                    fxCtx.fill();
+                } else {
+                    fxCtx.fillRect(-p.size * 0.5, -p.size * 0.35, p.size, p.size * 0.7);
+                }
+                fxCtx.restore();
+            }
+
+            // Gambar teks skor melayang
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.y += ft.vy;
+                ft.alpha -= 0.02;
+                if (ft.alpha <= 0) {
+                    floatingTexts.splice(i, 1);
+                    continue;
+                }
+                fxCtx.save();
+                fxCtx.font = '800 32px Fredoka, sans-serif';
+                fxCtx.textAlign = 'center';
+                fxCtx.globalAlpha = Math.max(0, ft.alpha);
+                fxCtx.lineWidth = 6;
+                fxCtx.strokeStyle = '#ffffff';
+                fxCtx.strokeText(ft.text, ft.x, ft.y);
+                fxCtx.fillStyle = '#16a34a';
+                fxCtx.fillText(ft.text, ft.x, ft.y);
+                fxCtx.restore();
+            }
+        }
+
+        /* ====================================================================
+           4. LOGIKA STATE PERMAINAN & ANIMASI BALON MENGAMBANG
+           ==================================================================== */
+        const state = {
+            studentName: 'Siswa Hebat',
+            controlMode: 'touch', // 'touch' atau 'camera'
+            cameraActive: false,
+            levelIndex: 0,        // 0..4
+            questionIndex: 0,     // 0..2
+            score: 0,
+            timeLeft: 30,
+            timerInterval: null,
+            isTransitioning: false,
+            balloons: [],         // Objek balon aktif di arena
+            lastTimestamp: 0
+        };
+
+        // Elemen DOM Utama
+        const hudStudentName = document.getElementById('hudStudentName');
+        const hudLevel = document.getElementById('hudLevel');
+        const hudCategory = document.getElementById('hudCategory');
+        const hudScore = document.getElementById('hudScore');
+        const hudTimer = document.getElementById('hudTimer');
+        const progressBar = document.getElementById('progressBar');
+        const questionNumberLabel = document.getElementById('questionNumberLabel');
+        const questionText = document.getElementById('questionText');
+        const balloonArena = document.getElementById('balloonArena');
+        const feedbackToast = document.getElementById('feedbackToast');
+
+        // Toast Umpan Balik
+        let toastTimeout = null;
+        function showFeedbackToast(message, isCorrect) {
+            feedbackToast.textContent = message;
+            feedbackToast.className = `feedback-toast show ${isCorrect ? 'correct' : 'wrong'}`;
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                feedbackToast.classList.remove('show');
+            }, 1050);
+        }
+
+        function updateHud() {
+            const currentLvl = GAME_LEVELS[state.levelIndex];
+            const currentQ = currentLvl.questions[state.questionIndex];
+
+            hudStudentName.textContent = `👦 ${state.studentName}`;
+            hudLevel.textContent = `🎈 Level ${currentLvl.level}/5`;
+            hudCategory.textContent = currentQ.category;
+            hudCategory.className = `badge-pill badge-hots hots-${currentQ.category}`;
+            hudScore.textContent = `⭐ ${state.score}`;
+
+            // Progress bar total 15 soal
+            const completedQuestions = state.levelIndex * 3 + state.questionIndex;
+            const pct = (completedQuestions / 15) * 100;
+            progressBar.style.width = `${pct}%`;
+
+            questionNumberLabel.textContent = `Level ${currentLvl.level}: ${currentLvl.title} • Soal ${state.questionIndex + 1} dari 3`;
+        }
+
+        function startQuestionTimer() {
+            stopQuestionTimer();
+            state.timeLeft = 30;
+            hudTimer.textContent = `⏱️ ${state.timeLeft}d`;
+            hudTimer.classList.remove('warning');
+
+            state.timerInterval = setInterval(() => {
+                if (state.isTransitioning) return;
+                state.timeLeft--;
+                hudTimer.textContent = `⏱️ ${Math.max(0, state.timeLeft)}d`;
+
+                if (state.timeLeft <= 8) {
+                    hudTimer.classList.add('warning');
+                }
+
+                if (state.timeLeft <= 0) {
+                    // Waktu habis: beri pengingat ramah dan reset timer soal agar anak tidak stuck
+                    sfx.playWrong();
+                    showFeedbackToast("⏰ Waktu habis! Ayo pilih balon jawabanmu!", false);
+                    state.timeLeft = 20;
+                    hudTimer.classList.remove('warning');
+                }
+            }, 1000);
+        }
+
+        function stopQuestionTimer() {
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+            }
+        }
+
+        // Acak urutan pilihan jawaban agar posisi balon selalu bervariasi
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        // Munculkan Balon 3D-style ke Arena
+        function renderQuestion() {
+            state.isTransitioning = false;
+            balloonArena.innerHTML = '';
+            state.balloons = [];
+
+            const currentLvl = GAME_LEVELS[state.levelIndex];
+            const currentQ = currentLvl.questions[state.questionIndex];
+
+            updateHud();
+            questionText.textContent = currentQ.text;
+            startQuestionTimer();
+
+            const shuffledOptions = shuffleArray(currentQ.options);
+            const count = shuffledOptions.length;
+
+            shuffledOptions.forEach((opt, idx) => {
+                // Sebar posisi horizontal secara proporsional agar tidak bertumpuk
+                const slotWidth = 100 / count;
+                const baseXPercent = slotWidth * idx + slotWidth * 0.5;
+                const baseYPercent = 48 + (idx % 2 === 0 ? -7 : 7);
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'balloon-wrapper';
+                wrapper.style.left = `${baseXPercent}%`;
+                wrapper.style.top = `${baseYPercent}%`;
+
+                // Badan Balon 3D
+                const body = document.createElement('div');
+                body.className = 'balloon-body';
+                body.style.background = `radial-gradient(circle at 32% 28%, #ffffff 0%, ${opt.color} 24%, ${opt.color} 82%, #0f172a 145%)`;
+
+                // Kartu label putih di tengah balon agar tulisan sangat kontras & terbaca anak SD
+                const labelCard = document.createElement('div');
+                labelCard.className = 'balloon-label-card';
+
+                if (opt.swatch) {
+                    const dot = document.createElement('div');
+                    dot.className = 'color-swatch-dot';
+                    dot.style.backgroundColor = opt.swatch;
+                    labelCard.appendChild(dot);
+                }
+
+                const textEl = document.createElement('span');
+                textEl.className = 'balloon-answer-text';
+                textEl.textContent = opt.text;
+                labelCard.appendChild(textEl);
+
+                body.appendChild(labelCard);
+
+                // Simpul balon
+                const knot = document.createElement('div');
+                knot.className = 'balloon-knot';
+                knot.style.backgroundColor = opt.color;
+
+                // Tali balon SVG bergelombang
+                const stringSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                stringSvg.setAttribute('class', 'balloon-string');
+                stringSvg.setAttribute('viewBox', '0 0 24 48');
+                stringSvg.innerHTML = `<path d="M12 0 Q 18 12, 12 24 T 12 48" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+
+                wrapper.appendChild(body);
+                wrapper.appendChild(knot);
+                wrapper.appendChild(stringSvg);
+
+                const balloonObj = {
+                    el: wrapper,
+                    option: opt,
+                    baseX: baseXPercent,
+                    baseY: baseYPercent,
+                    phaseY: idx * 1.4 + Math.random(),
+                    phaseX: idx * 0.9 + Math.random(),
+                    speedY: 1.7 + Math.random() * 0.5,
+                    speedX: 1.1 + Math.random() * 0.4,
+                    popped: false
+                };
+
+                // Event Klik / Sentuh Langsung (Alternatif Mouse & Touchscreen)
+                wrapper.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    sfx.init();
+                    handleBalloonSelect(balloonObj);
+                });
+
+                balloonArena.appendChild(wrapper);
+                state.balloons.push(balloonObj);
+            });
+        }
+
+        // Tangani Pemilihan / Pemecahan Balon
+        function handleBalloonSelect(balloonObj) {
+            if (state.isTransitioning || balloonObj.popped) return;
+
+            const rect = balloonObj.el.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height * 0.42;
+
+            if (balloonObj.option.correct) {
+                // JAWABAN BENAR!
+                state.isTransitioning = true;
+                balloonObj.popped = true;
+                stopQuestionTimer();
+
+                // Hitung skor + bonus kecepatan
+                const timeBonus = Math.max(10, state.timeLeft * 2);
+                const earned = 100 + timeBonus;
+                state.score += earned;
+                hudScore.textContent = `⭐ ${state.score}`;
+
+                sfx.playPop();
+                setTimeout(() => sfx.playCorrect(), 60);
+
+                spawnBalloonPopEffect(centerX, centerY, balloonObj.option.color, `+${earned}`);
+                balloonObj.el.style.visibility = 'hidden';
+
+                showFeedbackToast(`🎉 Hebat ${state.studentName}! Benar!`, true);
+
+                // Lanjut ke pertanyaan berikutnya atau level berikutnya
+                setTimeout(() => {
+                    advanceProgress();
+                }, 1150);
+
+            } else {
+                // JAWABAN SALAH -> Efek getar & umpan balik edukatif ramah anak
+                sfx.playWrong();
+                balloonObj.el.classList.remove('balloon-shake');
+                void balloonObj.el.offsetWidth; // Trigger reflow agar animasi ulang
+                balloonObj.el.classList.add('balloon-shake');
+
+                // Kurangi skor ringan (minimal 0) tanpa menghukum berlebihan
+                state.score = Math.max(0, state.score - 15);
+                hudScore.textContent = `⭐ ${state.score}`;
+
+                showFeedbackToast("😊 Ups, belum tepat! Ayo coba balon lain!", false);
+            }
+        }
+
+        function advanceProgress() {
+            state.questionIndex++;
+            if (state.questionIndex < 3) {
+                renderQuestion();
+            } else {
+                // Level saat ini selesai!
+                const finishedLevel = GAME_LEVELS[state.levelIndex];
+                progressBar.style.width = `${((state.levelIndex + 1) * 3 / 15) * 100}%`;
+                sfx.playFanfare();
+                spawnVictoryConfetti();
+
+                if (state.levelIndex < GAME_LEVELS.length - 1) {
+                    // Tampilkan Modal Transisi Level
+                    document.getElementById('levelModalBadge').textContent = `🎈 LEVEL ${finishedLevel.level} SELESAI!`;
+                    document.getElementById('levelModalTitle').textContent = `Hebat, ${state.studentName}!`;
+                    document.getElementById('levelModalDesc').textContent = finishedLevel.summary;
+                    document.getElementById('levelModalScore').textContent = state.score;
+                    document.getElementById('levelModal').classList.remove('hidden');
+                } else {
+                    // Semua 5 Level Selesai -> Tampilkan Sertifikat Akhir
+                    showFinalCertificate();
+                }
+            }
+        }
+
+        function showFinalCertificate() {
+            stopQuestionTimer();
+            document.getElementById('certStudentName').textContent = state.studentName;
+            document.getElementById('certFinalScore').textContent = `${state.score} Poin`;
+
+            let predicate = "Seniman Cilik Bintang Pelangi! 🌈";
+            let stars = "⭐⭐⭐";
+            if (state.score >= 1900) {
+                predicate = "Grandmaster Warna Pelangi Kelas 1! 👑🎨";
+                stars = "⭐⭐⭐";
+            } else if (state.score >= 1500) {
+                predicate = "Juara Ahli Warna Primer & Sekunder! 🌟";
+                stars = "⭐⭐⭐";
+            } else {
+                predicate = "Pelukis Cilik Pantang Menyerah! 🎨✨";
+                stars = "⭐⭐";
+            }
+
+            document.getElementById('certPredicate').textContent = `Predikat: ${predicate}`;
+            document.getElementById('endStarsRow').textContent = stars;
+            document.getElementById('endModal').classList.remove('hidden');
+
+            // Luncurkan konfeti berulang kali di layar akhir
+            spawnVictoryConfetti();
+            setTimeout(spawnVictoryConfetti, 900);
+        }
+
+        /* ====================================================================
+           5. INTEGRASI MEDIAPIPE HANDS (DETEKSI JARI TELUNJUK & GESTURE PINCH)
+           ==================================================================== */
+        const webcamVideo = document.getElementById('webcamVideo');
+        const cameraCanvas = document.getElementById('cameraCanvas');
+        const cameraCtx = cameraCanvas.getContext('2d');
+        const cameraWidget = document.getElementById('cameraWidget');
+        const cameraStatusBar = document.getElementById('cameraStatusBar');
+        const handCursor = document.getElementById('handCursor');
+        const cursorEmoji = document.getElementById('cursorEmoji');
+        const btnToggleCamera = document.getElementById('btnToggleCamera');
+        const camBtnLabel = document.getElementById('camBtnLabel');
+
+        let mpHands = null;
+        let mpCamera = null;
+        let isPinching = false;
+        let pinchCooldown = false;
+
+        async function startHandTracking() {
+            if (state.cameraActive) return;
+
+            try {
+                // Pastikan pustaka MediaPipe tersedia
+                if (typeof Hands === 'undefined' || typeof Camera === 'undefined') {
+                    throw new Error('Pustaka MediaPipe belum siap.');
+                }
+
+                cameraWidget.classList.add('active');
+                cameraStatusBar.textContent = 'Menyalakan kamera...';
+
+                if (!mpHands) {
+                    mpHands = new Hands({
+                        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                    });
+
+                    mpHands.setOptions({
+                        maxNumHands: 1,
+                        modelComplexity: 1,
+                        minDetectionConfidence: 0.65,
+                        minTrackingConfidence: 0.6
+                    });
+
+                    mpHands.onResults(onHandResults);
+                }
+
+                mpCamera = new Camera(webcamVideo, {
+                    onFrame: async () => {
+                        if (state.cameraActive && mpHands) {
+                            await mpHands.send({ image: webcamVideo });
+                        }
+                    },
+                    width: 320,
+                    height: 240
+                });
+
+                await mpCamera.start();
+                state.cameraActive = true;
+                btnToggleCamera.classList.add('active');
+                camBtnLabel.textContent = 'Kamera Aktif';
+                cameraStatusBar.textContent = 'Arahkan tanganmu 👋';
+
+            } catch (err) {
+                console.warn('Kamera tidak tersedia atau izin ditolak:', err);
+                stopHandTracking();
+                showFeedbackToast('📷 Kamera tidak aktif. Gunakan sentuhan/mouse ya!', false);
+            }
+        }
+
+        function stopHandTracking() {
+            state.cameraActive = false;
+            if (mpCamera) {
+                try { mpCamera.stop(); } catch (e) {}
+            }
+            if (webcamVideo.srcObject) {
+                webcamVideo.srcObject.getTracks().forEach(track => track.stop());
+                webcamVideo.srcObject = null;
+            }
+            cameraWidget.classList.remove('active');
+            handCursor.style.display = 'none';
+            btnToggleCamera.classList.remove('active');
+            camBtnLabel.textContent = 'Kamera';
+            clearBalloonHoverStates();
+        }
+
+        function clearBalloonHoverStates() {
+            state.balloons.forEach(b => b.el.classList.remove('hovered'));
+        }
+
+        function onHandResults(results) {
+            if (!state.cameraActive) return;
+
+            // Gambar preview kamera kecil
+            cameraCtx.save();
+            cameraCtx.clearRect(0, 0, cameraCanvas.width, cameraCanvas.height);
+            cameraCtx.drawImage(results.image, 0, 0, cameraCanvas.width, cameraCanvas.height);
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+
+                // Gambar kerangka jari di preview kecil agar menarik bagi anak
+                if (typeof drawConnectors !== 'undefined' && typeof HAND_CONNECTIONS !== 'undefined') {
+                    drawConnectors(cameraCtx, landmarks, HAND_CONNECTIONS, { color: '#38bdf8', lineWidth: 2 });
+                    drawLandmarks(cameraCtx, landmarks, { color: '#facc15', lineWidth: 1, radius: 3 });
+                }
+
+                // Landmark 8 = Ujung Jari Telunjuk, Landmark 4 = Ujung Ibu Jari
+                const indexTip = landmarks[8];
+                const thumbTip = landmarks[4];
+
+                // Koordinat layar (mirror horizontal agar alami seperti bercermin)
+                const screenX = (1 - indexTip.x) * window.innerWidth;
+                const screenY = indexTip.y * window.innerHeight;
+
+                handCursor.style.display = 'flex';
+                handCursor.style.left = `${screenX}px`;
+                handCursor.style.top = `${screenY}px`;
+
+                // Hitung jarak Euclidean 2D antara ibu jari & telunjuk untuk deteksi PINCH
+                const dx = indexTip.x - thumbTip.x;
+                const dy = indexTip.y - thumbTip.y;
+                const pinchDistance = Math.hypot(dx, dy);
+
+                // Cek balon mana yang sedang ditunjuk kursor tangan
+                let hoveredBalloon = null;
+                state.balloons.forEach(b => {
+                    if (b.popped) return;
+                    const rect = b.el.getBoundingClientRect();
+                    // Toleransi area sentuh +12px agar mudah bagi anak kelas 1
+                    const isInside = (
+                        screenX >= rect.left - 12 &&
+                        screenX <= rect.right + 12 &&
+                        screenY >= rect.top - 12 &&
+                        screenY <= rect.bottom + 12
+                    );
+                    if (isInside) {
+                        b.el.classList.add('hovered');
+                        hoveredBalloon = b;
+                    } else {
+                        b.el.classList.remove('hovered');
+                    }
+                });
+
+                // Ambang batas PINCH (0.055 bekerja sangat baik pada jarak duduk normal di depan laptop/tablet)
+                const PINCH_THRESHOLD = 0.055;
+                if (pinchDistance < PINCH_THRESHOLD) {
+                    if (!isPinching) {
+                        isPinching = true;
+                        handCursor.classList.add('pinching');
+                        cursorEmoji.textContent = '🤏';
+                        cameraStatusBar.textContent = '💥 CUBIT (PINCH)!';
+                        cameraStatusBar.classList.add('pinched');
+
+                        if (hoveredBalloon && !pinchCooldown) {
+                            pinchCooldown = true;
+                            sfx.init();
+                            handleBalloonSelect(hoveredBalloon);
+                            setTimeout(() => { pinchCooldown = false; }, 450);
+                        }
+                    }
+                } else {
+                    isPinching = false;
+                    handCursor.classList.remove('pinching');
+                    cursorEmoji.textContent = '👆';
+                    cameraStatusBar.textContent = hoveredBalloon ? '🎯 Siap cubit balon!' : 'Tangan terdeteksi ✅';
+                    cameraStatusBar.classList.remove('pinched');
+                }
+            } else {
+                handCursor.style.display = 'none';
+                cameraStatusBar.textContent = 'Arahkan tangan ke kamera 👋';
+                cameraStatusBar.classList.remove('pinched');
+                clearBalloonHoverStates();
+            }
+
+            cameraCtx.restore();
+        }
+
+        /* ====================================================================
+           6. LOOP ANIMASI UTAMA (GERAKAN BALON NAIK TURUN + PARTIKEL)
+           ==================================================================== */
+        function mainAnimationLoop(timestamp) {
+            const t = timestamp * 0.001; // Waktu dalam detik
+
+            // Gerakkan setiap balon naik-turun & berayun halus
+            state.balloons.forEach((b) => {
+                if (b.popped) return;
+                const offsetY = Math.sin(t * b.speedY + b.phaseY) * 4.5; // Naik turun (%)
+                const offsetX = Math.cos(t * b.speedX + b.phaseX) * 1.8; // Ayunan kiri-kanan (%)
+                const tiltDeg = Math.sin(t * b.speedX + b.phaseX) * 4;   // Kemiringan alami
+
+                b.el.style.left = `${b.baseX + offsetX}%`;
+                b.el.style.top = `${b.baseY + offsetY}%`;
+                if (!b.el.classList.contains('balloon-shake')) {
+                    b.el.style.transform = `translate(-50%, -50%) rotate(${tiltDeg}deg)`;
+                }
+            });
+
+            // Perbarui efek partikel
+            updateAndDrawFx();
+
+            requestAnimationFrame(mainAnimationLoop);
+        }
+
+        /* ====================================================================
+           7. EVENT LISTENER UI (LAYAR AWAL, NAVBAR, MODAL)
+           ==================================================================== */
+        const optTouchMouse = document.getElementById('optTouchMouse');
+        const optCameraGesture = document.getElementById('optCameraGesture');
+        const cameraConsentBox = document.getElementById('cameraConsentBox');
+        const cameraConsentCheckbox = document.getElementById('cameraConsentCheckbox');
+        const startErrorMsg = document.getElementById('startErrorMsg');
+        const studentNameInput = document.getElementById('studentNameInput');
+
+        optTouchMouse.addEventListener('click', () => {
+            state.controlMode = 'touch';
+            optTouchMouse.classList.add('selected');
+            optCameraGesture.classList.remove('selected');
+            cameraConsentBox.classList.remove('visible');
+            startErrorMsg.textContent = '';
+        });
+
+        optCameraGesture.addEventListener('click', () => {
+            state.controlMode = 'camera';
+            optCameraGesture.classList.add('selected');
+            optTouchMouse.classList.remove('selected');
+            cameraConsentBox.classList.add('visible');
+            startErrorMsg.textContent = '';
+        });
+
+        // Tombol Mulai Bermain
+        document.getElementById('btnStartGame').addEventListener('click', async () => {
+            const rawName = studentNameInput.value.trim();
+            if (!rawName) {
+                startErrorMsg.textContent = '⚠️ Ayo tulis namamu terlebih dahulu ya!';
+                studentNameInput.focus();
+                return;
+            }
+
+            if (state.controlMode === 'camera' && !cameraConsentCheckbox.checked) {
+                startErrorMsg.textContent = '⚠️ Centang kotak izin kamera dulu, atau pilih mode Sentuh/Mouse.';
+                return;
+            }
+
+            startErrorMsg.textContent = '';
+            sfx.init();
+            sfx.playCorrect();
+
+            state.studentName = rawName;
+            state.levelIndex = 0;
+            state.questionIndex = 0;
+            state.score = 0;
+
+            document.getElementById('startModal').classList.add('hidden');
+
+            if (state.controlMode === 'camera') {
+                await startHandTracking();
+            } else {
+                stopHandTracking();
+            }
+
+            renderQuestion();
+        });
+
+        // Tombol Lanjut ke Level Berikutnya
+        document.getElementById('btnNextLevel').addEventListener('click', () => {
+            sfx.init();
+            sfx.playPop();
+            document.getElementById('levelModal').classList.add('hidden');
+            state.levelIndex++;
+            state.questionIndex = 0;
+            renderQuestion();
+        });
+
+        // Tombol Main Lagi di Layar Akhir
+        document.getElementById('btnPlayAgain').addEventListener('click', () => {
+            sfx.init();
+            sfx.playCorrect();
+            document.getElementById('endModal').classList.add('hidden');
+            state.levelIndex = 0;
+            state.questionIndex = 0;
+            state.score = 0;
+            renderQuestion();
+        });
+
+        // Tombol Toggle Kamera di Navbar
+        btnToggleCamera.addEventListener('click', async () => {
+            sfx.init();
+            if (state.cameraActive) {
+                stopHandTracking();
+                showFeedbackToast('📷 Kamera dimatikan (Mode Sentuh/Mouse)', false);
+            } else {
+                await startHandTracking();
+            }
+        });
+
+        // Tombol Toggle Suara (Mute / Unmute) di Navbar
+        const btnToggleSound = document.getElementById('btnToggleSound');
+        btnToggleSound.addEventListener('click', () => {
+            const isMuted = sfx.toggleMute();
+            btnToggleSound.textContent = isMuted ? '🔇' : '🔊';
+            btnToggleSound.classList.toggle('muted', isMuted);
+        });
+
+        // Jalankan loop animasi setelah halaman dimuat
+        window.onload = function () {
+            requestAnimationFrame(mainAnimationLoop);
+        };
+    </script>
+</body>
+</html>
